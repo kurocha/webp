@@ -8,8 +8,8 @@ teapot_version "1.0.0"
 define_target "webp" do |target|
 	target.build do
 		source_files = Files::Directory.join(target.package.path, "libwebp")
-		cache_prefix = Path.join(environment[:build_prefix], "libwebp-#{environment.checksum}")
-		package_files = Path.join(environment[:install_prefix], "lib/libwebp.a")
+		cache_prefix = environment[:build_prefix] / environment.checksum + "libwebp"
+		package_files = environment[:install_prefix] / "lib/libwebp.a"
 		
 		copy source: source_files, prefix: cache_prefix
 		
