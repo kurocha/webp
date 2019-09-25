@@ -3,42 +3,35 @@
 #  This file is part of the "Teapot" project, and is released under the MIT license.
 #
 
-teapot_version "1.0.0"
+teapot_version "3.0"
 
 define_target "webp" do |target|
-	target.build do
-		source_files = Files::Directory.join(target.package.path, "libwebp")
-		cache_prefix = environment[:build_prefix] / environment.checksum + "libwebp"
-		package_files = environment[:install_prefix] / "lib/libwebp.a"
-		
-		copy source: source_files, prefix: cache_prefix
-		
-		configure prefix: cache_prefix do
-			run! "./autogen.sh", chdir: cache_prefix
-			
-			run! "./configure",
-				"--prefix=#{environment[:install_prefix]}",
-				"--enable-shared=no",
-				"--enable-static=yes",
-				*environment[:configure],
-				chdir: cache_prefix
-		end
-		
-		make prefix: cache_prefix, package_files: package_files
-	end
-	
 	target.depends :platform
-	target.depends "Build/Files"
+	
 	target.depends "Build/Make"
+	target.depends "Build/CMake"
 	
 	target.provides "Library/webp" do
-		append linkflags ->{install_prefix + "lib/libwebp.a"}
+		source_files = target.package.path + "libwebp"
+		cache_prefix = environment[:build_prefix] / environment.checksum + "webp"
+		package_files = cache_prefix / "libwebp.a"
+		
+		cmake source: source_files, build_prefix: cache_prefix, arguments: [
+			"-DBUILD_SHARED_LIBS=OFF",
+		]
+		
+		make prefix: cache_prefix, package_files: package_files, install: false
+		
+		append linkflags cache_prefix + "libwebp.a"
+		append header_search_paths cache_prefix + "include"
 	end
 end
 
 define_configuration 'test' do |configuration|
-	configuration[:source] = "https://github.com/kurocha"
+	configuration[:source] = "https://github.com/kurocha/"
 	
-	configuration.require 'platforms'
-	configuration.require 'build-make'
+	configuration.require "platforms"
+	
+	configuration.require "build-make"
+	configuration.require "build-cmake"
 end
