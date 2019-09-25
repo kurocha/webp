@@ -20,7 +20,7 @@ define_target "webp" do |target|
 			"-DBUILD_SHARED_LIBS=OFF",
 		]
 		
-		make prefix: cache_prefix, package_files: package_files, install: false
+		make prefix: cache_prefix, package_files: package_files
 		
 		append linkflags cache_prefix + "libwebp.a"
 		append header_search_paths cache_prefix + "include"
