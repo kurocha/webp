@@ -5,6 +5,13 @@
 
 teapot_version "3.0"
 
+webp_libraries = [
+	"lib/libwebp.a",
+	"lib/libwebpdecoder.a",
+	"lib/libwebpdemux.a",
+	"lib/libwebpmux.a",
+]
+
 define_target "webp" do |target|
 	target.depends :platform
 	
@@ -14,15 +21,13 @@ define_target "webp" do |target|
 	target.provides "Library/webp" do
 		source_files = target.package.path + "libwebp"
 		cache_prefix = environment[:build_prefix] / environment.checksum + "webp"
-		package_files = cache_prefix / "libwebp.a"
+		package_files = cache_prefix.list(*webp_libraries)
 		
-		cmake source: source_files, build_prefix: cache_prefix, arguments: [
+		cmake source: source_files, install_prefix: cache_prefix, arguments: [
 			"-DBUILD_SHARED_LIBS=OFF",
-		]
+		], package_files: package_files
 		
-		make prefix: cache_prefix, package_files: package_files
-		
-		append linkflags cache_prefix + "libwebp.a"
+		append linkflags package_files
 		append header_search_paths cache_prefix + "include"
 	end
 end
