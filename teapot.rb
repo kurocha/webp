@@ -25,6 +25,7 @@ define_target "webp" do |target|
 		
 		cmake source: source_files, install_prefix: cache_prefix, arguments: [
 			"-DBUILD_SHARED_LIBS=OFF",
+			"-DWEBP_BUILD_VWEBP=OFF",
 		], package_files: package_files
 		
 		append linkflags package_files
